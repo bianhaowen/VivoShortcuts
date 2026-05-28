@@ -157,19 +157,19 @@ private fun VolumeButton(
                 interactionSource = interactionSource,
                 indication = null
             ) { applyVolume(audioManager, percent) }
-            .padding(horizontal = 22.dp, vertical = 22.dp),
+            .padding(horizontal = 18.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         SpeakerIcon(
-            modifier = Modifier.size(33.dp),
+            modifier = Modifier.size(24.dp),
             tint = Color.White,
             level = percent
         )
-        Spacer(modifier = Modifier.width(15.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "$percent%",
             color = Color.White,
-            fontSize = 28.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
     }

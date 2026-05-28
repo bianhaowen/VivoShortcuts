@@ -51,15 +51,15 @@ android {
     }
 
     base {
-        archivesName = "XCShortcuts"
+        archivesName = "XCshortcuts"
     }
 }
 
 tasks.register("renameReleaseApk") {
     doLast {
         val releaseDir = layout.buildDirectory.dir("outputs/apk/release").get().asFile
-        val from = File(releaseDir, "XCShortcuts-release.apk")
-        val to = File(releaseDir, "XCShortcuts.apk")
+        val from = File(releaseDir, "XCshortcuts-release.apk")
+        val to = File(releaseDir, "XCshortcuts.apk")
         if (from.exists()) from.renameTo(to)
     }
 }

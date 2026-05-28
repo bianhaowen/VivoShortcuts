@@ -133,7 +133,7 @@ fun VolumeFloatingWindow(onDismiss: () -> Unit) {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 volumeButtons.take(5).forEach { btn ->
-                    VolButtonView(btn, audioManager, context)
+                    VolButtonView(btn, audioManager)
                 }
             }
 
@@ -141,7 +141,7 @@ fun VolumeFloatingWindow(onDismiss: () -> Unit) {
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 volumeButtons.drop(5).forEach { btn ->
-                    VolButtonView(btn, audioManager, context)
+                    VolButtonView(btn, audioManager)
                 }
             }
         }
@@ -151,8 +151,7 @@ fun VolumeFloatingWindow(onDismiss: () -> Unit) {
 @Composable
 private fun VolButtonView(
     btn: VolButton,
-    audioManager: AudioManager,
-    context: Context
+    audioManager: AudioManager
 ) {
     Box(
         modifier = Modifier
@@ -164,7 +163,7 @@ private fun VolButtonView(
                 )
             )
             .clickable {
-                applyVolume(audioManager, context, btn.percent)
+                applyVolume(audioManager, btn.percent)
             },
         contentAlignment = Alignment.Center
     ) {
@@ -241,7 +240,7 @@ private fun SpeakerIcon(
     }
 }
 
-private fun applyVolume(audioManager: AudioManager, context: Context, percent: Int) {
+private fun applyVolume(audioManager: AudioManager, percent: Int) {
     if (audioManager.ringerMode != AudioManager.RINGER_MODE_NORMAL) {
         try {
             audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL)

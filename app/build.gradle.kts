@@ -16,9 +16,20 @@ android {
         versionName = "1.0"
     }
 
+    signingConfigs {
+        register("release") {
+            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -38,6 +49,25 @@ android {
     buildFeatures {
         compose = true
     }
+
+    base {
+        archivesName = "XCShortcuts"
+    }
+}
+
+tasks.register("renameReleaseApk") {
+    doLast {
+        val releaseDir = layout.buildDirectory.dir("outputs/apk/release").get().asFile
+        val from = File(releaseDir, "XCShortcuts-release.apk")
+        val to = File(releaseDir, "XCShortcuts.apk")
+        if (from.exists()) from.renameTo(to)
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name == "assembleRelease" }.configureEach {
+        finalizedBy("renameReleaseApk")
+    }
 }
 
 dependencies {
@@ -50,8 +80,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-
-    implementation(libs.androidx.navigation.compose)
 
     debugImplementation(libs.androidx.ui.tooling)
 }

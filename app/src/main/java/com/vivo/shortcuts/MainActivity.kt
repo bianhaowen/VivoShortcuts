@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -92,27 +91,18 @@ private fun MainScreen(audioManager: AudioManager) {
             .background(Color(0xFFF5F5F5))
             .statusBarsPadding()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp),
+            .padding(horizontal = 28.dp, vertical = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.width(340.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = "音量快捷设置",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF888888),
-                letterSpacing = 1.sp
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
             for (row in 0 until 5) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     for (col in 0 until 2) {
                         val idx = row * 2 + col
@@ -124,7 +114,6 @@ private fun MainScreen(audioManager: AudioManager) {
                         )
                     }
                 }
-                if (row < 4) Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
@@ -153,7 +142,7 @@ private fun VolumeButton(
         label = "press-elevation"
     )
 
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(20.dp)
 
     Row(
         modifier = modifier
@@ -168,19 +157,19 @@ private fun VolumeButton(
                 interactionSource = interactionSource,
                 indication = null
             ) { applyVolume(audioManager, percent) }
-            .padding(horizontal = 14.dp, vertical = 14.dp),
+            .padding(horizontal = 22.dp, vertical = 22.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         SpeakerIcon(
-            modifier = Modifier.size(22.dp),
+            modifier = Modifier.size(33.dp),
             tint = Color.White,
             level = percent
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(15.dp))
         Text(
             text = "$percent%",
             color = Color.White,
-            fontSize = 18.sp,
+            fontSize = 28.sp,
             fontWeight = FontWeight.Bold
         )
     }

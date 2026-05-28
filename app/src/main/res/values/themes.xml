@@ -2,17 +2,8 @@
 <resources>
     <style name="Theme.VivoShortcuts" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Theme.VivoShortcuts.Translucent" parent="Theme.VivoShortcuts">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorBackground">@android:color/transparent</item>
-        <item name="android:colorBackgroundFloating">@android:color/transparent</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
+    <style name="Theme.VivoShortcuts.NoDisplay" parent="Theme.VivoShortcuts">
+        <item name="android:windowNoDisplay">true</item>
         <item name="android:windowDisablePreview">true</item>
-        <item name="android:windowAnimationStyle">@null</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

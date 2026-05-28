@@ -18,16 +18,12 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity=""
-            android:theme="@style/Theme.VivoShortcuts">
+            android:theme="@style/Theme.VivoShortcuts.NoDisplay">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".FloatingWindowService"
-            android:exported="false" />
     </application>
 
 </manifest>

@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             VivoShortcutsTheme {
-                VolumeFloatingWindow(onDismiss = { finish() })
+                VolumeFloatingWindow(onDismiss = { finishAndRemoveTask() })
             }
         }
     }
@@ -92,7 +92,6 @@ fun VolumeFloatingWindow(onDismiss: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.35f))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null
@@ -102,7 +101,7 @@ fun VolumeFloatingWindow(onDismiss: () -> Unit) {
         Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(28.dp))
-                .background(Color.White.copy(alpha = 0.78f))
+                .background(Color.White.copy(alpha = 0.88f))
                 .border(
                     width = 1.dp,
                     brush = Brush.linearGradient(

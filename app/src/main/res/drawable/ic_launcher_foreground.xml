@@ -4,7 +4,25 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+
+    <!-- X letter: two crossing lines -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M54,30L62,40L54,40ZM46,40L54,30L46,30ZM38,40L46,40L46,48L38,48ZM46,52L54,52L54,60L46,60ZM38,62L46,62L46,72L38,72ZM54,62L62,62L62,72L54,72ZM54,40L62,48L62,56L54,48ZM46,52L38,48L38,56L46,60Z" />
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:pathData="M18,26L50,78" />
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:pathData="M50,26L18,78" />
+
+    <!-- C letter: left-opening arc -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="10"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M74,32A22,22 0 0,0 74,76" />
+
 </vector>

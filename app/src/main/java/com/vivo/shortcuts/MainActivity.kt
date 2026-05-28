@@ -1,38 +1,38 @@
 package com.vivo.shortcuts
 
-import android.content.Context
-import android.content.Intent
-import android.graphics.PixelFormat
-import android.graphics.drawable.ColorDrawable
 import android.media.AudioManager
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -40,212 +40,149 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 class MainActivity : ComponentActivity() {
 
-    private var overlayView: ComposeView? = null
-    private lateinit var windowManager: WindowManager
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-            !Settings.canDrawOverlays(this)
-        ) {
-            startActivity(
-                Intent(
-                    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:$packageName")
-                )
-            )
-            finishAndRemoveTask()
-            return
-        }
+        val w = (340 * resources.displayMetrics.density).toInt()
+        window.setLayout(w, WindowManager.LayoutParams.WRAP_CONTENT)
+        window.setGravity(Gravity.CENTER)
 
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        showOverlay()
+        val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
+
+        setContent {
+            MainScreen(audioManager = audioManager)
+        }
     }
 
-    private fun showOverlay() {
-        if (overlayView != null) return
-
-        val type = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-        } else {
-            @Suppress("DEPRECATION")
-            WindowManager.LayoutParams.TYPE_PHONE
-        }
-
-        val params = WindowManager.LayoutParams(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.MATCH_PARENT,
-            type,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-            PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.CENTER
-        }
-
-        val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
-        overlayView = ComposeView(this).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
-            )
-            setContent {
-                VolumeFloatingWindow(
-                    audioManager = audioManager,
-                    onDismiss = { removeOverlay() }
-                )
-            }
-        }
-
-        windowManager.addView(overlayView, params)
-    }
-
-    private fun removeOverlay() {
-        overlayView?.let { windowManager.removeView(it) }
-        overlayView = null
-        finishAndRemoveTask()
-    }
-
-    override fun onDestroy() {
-        removeOverlay()
-        super.onDestroy()
+    override fun onStop() {
+        super.onStop()
+        if (!isFinishing) finish()
     }
 }
 
-// ── UI ──────────────────────────────────────────────────────────
+// ── Color palette: smooth top-left → bottom-right ──────────────
 
-private data class VolButton(
-    val percent: Int,
-    val startColor: Color,
-    val endColor: Color
+private val buttonColors = listOf(
+    Color(0xFFFF8A80), // 10%  coral
+    Color(0xFFFFAB73), // 20%  orange
+    Color(0xFFFFC966), // 30%  amber
+    Color(0xFFAED16A), // 40%  lime
+    Color(0xFF72C87A), // 50%  green
+    Color(0xFF60C0B0), // 60%  teal
+    Color(0xFF5BA8D0), // 70%  blue
+    Color(0xFF7088CC), // 80%  indigo
+    Color(0xFF9078C0), // 90%  purple
+    Color(0xFFC078A8)  // 100% pink
 )
 
-private val volumeButtons = listOf(
-    VolButton(10, Color(0xFFFF8A80), Color(0xFFFFB4AB)),
-    VolButton(20, Color(0xFFFFAB73), Color(0xFFFFC9A3)),
-    VolButton(30, Color(0xFFFFC966), Color(0xFFFFDA91)),
-    VolButton(40, Color(0xFFAED16A), Color(0xFFCBDF8E)),
-    VolButton(50, Color(0xFF72C87A), Color(0xFF98D89F)),
-    VolButton(60, Color(0xFF60C0B0), Color(0xFF86D4C8)),
-    VolButton(70, Color(0xFF5BA8D0), Color(0xFF82C2E0)),
-    VolButton(80, Color(0xFF7088CC), Color(0xFF96A8DC)),
-    VolButton(90, Color(0xFF9078C0), Color(0xFFAE9CD4)),
-    VolButton(100, Color(0xFFC078A8), Color(0xFFD49CC0))
-)
+private val percentages = listOf(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
+
+// ── Main Screen ─────────────────────────────────────────────────
 
 @Composable
-private fun VolumeFloatingWindow(
-    audioManager: AudioManager,
-    onDismiss: () -> Unit
-) {
-    Box(
+private fun MainScreen(audioManager: AudioManager) {
+    Column(
         modifier = Modifier
-            .fillMaxSize()
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onDismiss() },
-        contentAlignment = Alignment.Center
+            .width(340.dp)
+            .background(Color(0xFFF5F5F5), RoundedCornerShape(20.dp))
+            .padding(horizontal = 16.dp, vertical = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .clip(RoundedCornerShape(28.dp))
-                .background(Color.White.copy(alpha = 0.88f))
-                .border(
-                    width = 1.dp,
-                    brush = Brush.linearGradient(
-                        colors = listOf(
-                            Color.White.copy(alpha = 0.85f),
-                            Color.White.copy(alpha = 0.15f),
-                            Color.White.copy(alpha = 0.60f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(28.dp)
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { /* consume click */ }
-                .padding(horizontal = 22.dp, vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "音量快捷设置",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF777777),
-                letterSpacing = 1.sp
-            )
+        Text(
+            text = "音量快捷设置",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF888888),
+            letterSpacing = 1.sp
+        )
 
-            Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                volumeButtons.take(5).forEach { btn ->
-                    VolButtonView(btn, audioManager)
+        for (row in 0 until 5) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                for (col in 0 until 2) {
+                    val idx = row * 2 + col
+                    VolumeButton(
+                        modifier = Modifier.weight(1f),
+                        percent = percentages[idx],
+                        color = buttonColors[idx],
+                        audioManager = audioManager
+                    )
                 }
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                volumeButtons.drop(5).forEach { btn ->
-                    VolButtonView(btn, audioManager)
-                }
-            }
+            if (row < 4) Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
 
+// ── Volume Button ───────────────────────────────────────────────
+
 @Composable
-private fun VolButtonView(
-    btn: VolButton,
+private fun VolumeButton(
+    modifier: Modifier = Modifier,
+    percent: Int,
+    color: Color,
     audioManager: AudioManager
 ) {
-    Box(
-        modifier = Modifier
-            .size(56.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(btn.startColor, btn.endColor)
-                )
-            )
-            .clickable {
-                applyVolume(audioManager, btn.percent)
-            },
-        contentAlignment = Alignment.Center
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(dampingRatio = 0.5f),
+        label = "press-scale"
+    )
+    val elevation by animateDpAsState(
+        targetValue = if (isPressed) 1.dp else 5.dp,
+        animationSpec = spring(dampingRatio = 0.5f),
+        label = "press-elevation"
+    )
+
+    val shape = RoundedCornerShape(14.dp)
+
+    Row(
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .shadow(elevation, shape)
+            .clip(shape)
+            .background(color)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null
+            ) { applyVolume(audioManager, percent) }
+            .padding(horizontal = 14.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            SpeakerIcon(
-                modifier = Modifier.size(20.dp),
-                tint = Color.White,
-                level = btn.percent
-            )
-            Spacer(modifier = Modifier.height(1.dp))
-            Text(
-                text = "${btn.percent}%",
-                color = Color.White,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center,
-                letterSpacing = 0.5.sp
-            )
-        }
+        SpeakerIcon(
+            modifier = Modifier.size(22.dp),
+            tint = Color.White,
+            level = percent
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "$percent%",
+            color = Color.White,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
+
+// ── Speaker Icon (Canvas) ───────────────────────────────────────
 
 @Composable
 private fun SpeakerIcon(
@@ -297,6 +234,8 @@ private fun SpeakerIcon(
         }
     }
 }
+
+// ── Volume Logic ────────────────────────────────────────────────
 
 private fun applyVolume(audioManager: AudioManager, percent: Int) {
     if (audioManager.ringerMode != AudioManager.RINGER_MODE_NORMAL) {

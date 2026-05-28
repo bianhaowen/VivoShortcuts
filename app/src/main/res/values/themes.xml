@@ -2,8 +2,11 @@
 <resources>
     <style name="Theme.VivoShortcuts" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Theme.VivoShortcuts.NoDisplay" parent="Theme.VivoShortcuts">
-        <item name="android:windowNoDisplay">true</item>
-        <item name="android:windowDisablePreview">true</item>
+    <style name="Theme.VivoShortcuts.Compact" parent="Theme.VivoShortcuts">
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowCloseOnTouchOutside">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
     </style>
 </resources>

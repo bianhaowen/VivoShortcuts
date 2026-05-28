@@ -17,7 +17,7 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity=""
-            android:theme="@style/Theme.VivoShortcuts.Compact">
+            android:theme="@style/Theme.VivoShortcuts">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

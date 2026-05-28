@@ -2,10 +2,9 @@ package com.vivo.shortcuts
 
 import android.media.AudioManager
 import android.os.Bundle
-import android.view.Gravity
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -15,14 +14,17 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -35,13 +37,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,10 +50,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val w = (340 * resources.displayMetrics.density).toInt()
-        window.setLayout(w, WindowManager.LayoutParams.WRAP_CONTENT)
-        window.setGravity(Gravity.CENTER)
+        enableEdgeToEdge()
 
         val audioManager = getSystemService(AUDIO_SERVICE) as AudioManager
 
@@ -89,39 +86,46 @@ private val percentages = listOf(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 
 @Composable
 private fun MainScreen(audioManager: AudioManager) {
-    Column(
+    Box(
         modifier = Modifier
-            .width(340.dp)
-            .background(Color(0xFFF5F5F5), RoundedCornerShape(20.dp))
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .background(Color(0xFFF5F5F5))
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 20.dp),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "音量快捷设置",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF888888),
-            letterSpacing = 1.sp
-        )
+        Column(
+            modifier = Modifier.width(340.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "音量快捷设置",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF888888),
+                letterSpacing = 1.sp
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        for (row in 0 until 5) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                for (col in 0 until 2) {
-                    val idx = row * 2 + col
-                    VolumeButton(
-                        modifier = Modifier.weight(1f),
-                        percent = percentages[idx],
-                        color = buttonColors[idx],
-                        audioManager = audioManager
-                    )
+            for (row in 0 until 5) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    for (col in 0 until 2) {
+                        val idx = row * 2 + col
+                        VolumeButton(
+                            modifier = Modifier.weight(1f),
+                            percent = percentages[idx],
+                            color = buttonColors[idx],
+                            audioManager = audioManager
+                        )
+                    }
                 }
+                if (row < 4) Spacer(modifier = Modifier.height(10.dp))
             }
-            if (row < 4) Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }

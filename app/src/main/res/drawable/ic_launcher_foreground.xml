@@ -5,24 +5,53 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- X letter: two crossing lines -->
+    <!-- X (first line, left half) -->
     <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="10"
+        android:strokeWidth="7"
         android:strokeLineCap="round"
-        android:pathData="M18,26L50,78" />
+        android:pathData="M20,24 L44,54" />
     <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="10"
+        android:strokeWidth="7"
         android:strokeLineCap="round"
-        android:pathData="M50,26L18,78" />
+        android:pathData="M44,24 L20,54" />
 
-    <!-- C letter: left-opening arc -->
+    <!-- C (first line, right half) -->
     <path
         android:strokeColor="#FFFFFF"
-        android:strokeWidth="10"
+        android:strokeWidth="7"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
-        android:pathData="M74,32A22,22 0 0,0 74,76" />
+        android:pathData="M68,28A18,18 0 0,0 68,50" />
+
+    <!-- "shortcuts" letter paths (second line) -->
+    <!-- s -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M19,58 Q21,56 23,58 Q24,58 24,61 Q24,63 22,63 L18,65.5 Q17,65.5 17,67 Q17,69 20,69 Q23,69 23,67" />
+    <!-- h -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round"
+        android:pathData="M25,56 L25,70 M25,61.5 Q25,61 27,61 Q29.5,61 29.5,64 L29.5,70" />
+    <!-- o -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round" android:fillColor="#00000000"
+        android:pathData="M33,67.5 A3,3 0 1,0 33,61.5 A3,3 0 1,0 33,67.5" />
+    <!-- r -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round"
+        android:pathData="M38,61 L38,70 M38,61.5 Q38,61 40,61 Q42,61 42,64" />
+    <!-- t -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round"
+        android:pathData="M44,56.5 L44,70 M41.5,62 L46.5,62" />
+    <!-- c -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round" android:fillColor="#00000000"
+        android:pathData="M50,61.5 A3,3 0 0,0 50,67.5" />
+    <!-- u -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M55,61 L55,66 Q55,69 57.5,69 Q60,69 60,66 L60,61" />
+    <!-- t -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round"
+        android:pathData="M62,56.5 L62,70 M59.5,62 L64.5,62" />
+    <!-- s -->
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="2.2" android:strokeLineCap="round" android:strokeLineJoin="round"
+        android:pathData="M67,58 Q69,56 71,58 Q72,58 72,61 Q72,63 70,63 L66,65.5 Q65,65.5 65,67 Q65,69 68,69 Q71,69 71,67" />
 
 </vector>

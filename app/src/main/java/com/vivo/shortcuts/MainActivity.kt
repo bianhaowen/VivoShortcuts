@@ -20,16 +20,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +49,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 
 class MainActivity : ComponentActivity() {
 
@@ -85,6 +91,8 @@ private val percentages = listOf(10, 20, 30, 40, 50, 60, 70, 80, 90, 100)
 
 @Composable
 private fun MainScreen(audioManager: AudioManager) {
+    var showVolumePanel by remember { mutableStateOf(false) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -110,11 +118,19 @@ private fun MainScreen(audioManager: AudioManager) {
                             modifier = Modifier.weight(1f),
                             percent = percentages[idx],
                             color = buttonColors[idx],
-                            audioManager = audioManager
+                            audioManager = audioManager,
+                            onVolumeApplied = { showVolumePanel = true }
                         )
                     }
                 }
             }
+        }
+
+        if (showVolumePanel) {
+            VolumePanel(
+                audioManager = audioManager,
+                onDismiss = { showVolumePanel = false }
+            )
         }
     }
 }
@@ -126,7 +142,8 @@ private fun VolumeButton(
     modifier: Modifier = Modifier,
     percent: Int,
     color: Color,
-    audioManager: AudioManager
+    audioManager: AudioManager,
+    onVolumeApplied: () -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -156,7 +173,10 @@ private fun VolumeButton(
             .clickable(
                 interactionSource = interactionSource,
                 indication = null
-            ) { applyVolume(audioManager, percent) }
+            ) {
+                applyVolume(audioManager, percent)
+                onVolumeApplied()
+            }
             .padding(horizontal = 18.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -224,6 +244,90 @@ private fun SpeakerIcon(
                 size = Size(w * 0.30f, h * 0.76f),
                 style = Stroke(width = sw, cap = StrokeCap.Round)
             )
+        }
+    }
+}
+
+// ── Volume Panel Dialog ──────────────────────────────────────────
+
+@Composable
+private fun VolumePanel(
+    audioManager: AudioManager,
+    onDismiss: () -> Unit
+) {
+    val streams = listOf(
+        AudioManager.STREAM_MUSIC to "媒体",
+        AudioManager.STREAM_RING to "铃声",
+        AudioManager.STREAM_NOTIFICATION to "通知",
+        AudioManager.STREAM_ALARM to "闹钟"
+    )
+
+    LaunchedEffect(Unit) {
+        delay(3000)
+        onDismiss()
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.4f))
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { onDismiss() },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 40.dp)
+                .shadow(12.dp, RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(20.dp))
+                .background(Color.White)
+                .padding(20.dp)
+        ) {
+            Text(
+                text = "当前音量",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF333333),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            for ((stream, label) in streams) {
+                val max = audioManager.getStreamMaxVolume(stream)
+                val current = audioManager.getStreamVolume(stream)
+                val percent = (current * 100 / max).coerceIn(0, 100)
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = label,
+                        fontSize = 14.sp,
+                        color = Color(0xFF666666),
+                        modifier = Modifier.width(44.dp)
+                    )
+                    Slider(
+                        value = current.toFloat(),
+                        onValueChange = { v ->
+                            audioManager.setStreamVolume(stream, v.toInt(), 0)
+                        },
+                        valueRange = 0f..max.toFloat(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(32.dp)
+                    )
+                    Text(
+                        text = "$percent%",
+                        fontSize = 13.sp,
+                        color = Color(0xFF999999),
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
         }
     }
 }

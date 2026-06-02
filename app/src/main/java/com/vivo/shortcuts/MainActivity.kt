@@ -249,4 +249,10 @@ private fun applyVolume(audioManager: AudioManager, percent: Int) {
         val target = (max * percent / 100).coerceIn(0, max)
         audioManager.setStreamVolume(stream, target, 0)
     }
+
+    audioManager.adjustStreamVolume(
+        AudioManager.STREAM_RING,
+        AudioManager.ADJUST_SAME,
+        AudioManager.FLAG_SHOW_UI
+    )
 }

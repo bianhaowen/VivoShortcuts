@@ -250,9 +250,9 @@ private fun applyVolume(audioManager: AudioManager, percent: Int) {
         audioManager.setStreamVolume(stream, target, 0)
     }
 
-    audioManager.adjustStreamVolume(
-        AudioManager.STREAM_RING,
+    audioManager.adjustSuggestedStreamVolume(
         AudioManager.ADJUST_SAME,
+        AudioManager.STREAM_RING,
         AudioManager.FLAG_SHOW_UI
     )
 }
